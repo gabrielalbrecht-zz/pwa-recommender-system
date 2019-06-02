@@ -1,0 +1,27 @@
+<ion-content padding>
+	<ion-navbar class="centered-text">
+		<ion-title class="title-modal">Login</ion-title>
+	</ion-navbar>
+	<div class="modal-background">
+		<form #loginForm="ngForm" (ngSubmit)="handleLogin()">
+			<ion-item>
+				<ion-label stacked color="primary">Email</ion-label>
+				<ion-input class="input-modal" color="light" [(ngModel)]="login.email" name="login.email"></ion-input>
+			</ion-item>
+			<ion-item>
+				<ion-label stacked class="label-modal" color="primary">Senha</ion-label>
+				<ion-input class="input-modal" color="light" type="password" [(ngModel)]="login.password"
+					name="login.password"></ion-input>
+			</ion-item>
+		</form>
+		<div class="centered-text padding-buttons">
+			<button ion-button class="button-modal" color="primary" round
+				(click)="loginForm.ngSubmit.emit()">Login</button><br>
+			<button ion-button class="button button-modal" color="primary" round (click)="createAccount()">Criar
+				conta</button><br>
+			<button ion-button class="button button-modal" color="primary" outline round (click)="dismiss()">Continuar
+				como
+				anônimo</button>
+		</div>
+	</div>
+</ion-content>

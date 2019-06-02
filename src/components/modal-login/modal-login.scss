@@ -1,0 +1,30 @@
+modal-login {
+	.centered-text {
+		text-align: center;
+	}
+
+	.scroll-content {
+		overflow-x: hidden;
+		overflow-y: hidden;
+	}
+
+	.item-md.item-block .item-inner {
+		padding: 0px;
+	}
+
+	.item-md {
+		padding-right: 16px;
+	}
+
+	.text-input-md {
+		margin: 13px 10px;
+	}
+
+	button {
+		width: 250px;
+	}
+
+	.padding-buttons {
+		padding-top: 25px;
+	}
+}

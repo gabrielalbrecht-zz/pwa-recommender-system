@@ -1,0 +1,35 @@
+<ion-header>
+	<ion-navbar color="primary">
+		<button *ngIf="loggedIn" ion-button menuToggle>
+			<ion-icon name="menu"></ion-icon>
+		</button>
+		<ion-title>Início</ion-title>
+		<ion-buttons end margin-right>
+			<button class="button" *ngIf="!loggedIn" ion-button icon-start (click)="showModalLogin()">
+				<ion-icon name="log-in"></ion-icon>
+				Login
+			</button>
+			<button class="button" *ngIf="loggedIn" ion-button icon-start (click)="logout()">
+				<ion-icon name="log-out"></ion-icon>
+				Logout
+			</button>
+		</ion-buttons>
+	</ion-navbar>
+</ion-header>
+
+<ion-content padding>
+	<ion-item class="search-bar">
+		<ion-input type="text" placeholder="Pesquisar" [(ngModel)]="query"></ion-input>
+		<button class="search-button" (click)="search()" item-right>
+			<ion-icon name="search" primary></ion-icon>
+		</button>
+	</ion-item>
+	<ion-list>
+		<ion-item *ngFor="let lm of learningMaterials" (click)="watch(lm)">
+			<ion-thumbnail item-start>
+				<img src="{{lm.thumbnail}}">
+			</ion-thumbnail>
+			<h2>{{lm.title}}</h2>
+		</ion-item>
+	</ion-list>
+</ion-content>
