@@ -1,18 +1,36 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <button ion-button menuToggle>
-      <ion-icon name="menu"></ion-icon>
-    </button>
-    <ion-title>Minha conta</ion-title>
-    <ion-buttons end margin-right>
-      <button ion-button icon-start (click)="showModalLogin()">
-        <ion-icon name="log-in"></ion-icon>
-        Login
-      </button>
-    </ion-buttons>
-  </ion-navbar>
+	<ion-navbar color="primary">
+		<button ion-button menuToggle>
+			<ion-icon name="menu"></ion-icon>
+		</button>
+		<ion-title>Minha conta</ion-title>
+	</ion-navbar>
 </ion-header>
 
 <ion-content padding>
-
+	<img class="round-img" height="60" width="60" [src]="user.image" /> <br>
+	<button ion-button class="button-modal" color="primary" round (click)="getPhoto()">Escolher imagem</button> <br>
+	<form #userForm="ngForm" (ngSubmit)="handleEditUser()">
+		<ion-item>
+			<ion-label stacked color="primary">Email</ion-label>
+			<ion-input class="input-modal" color="light" [(ngModel)]="user.email" name="user.email"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label stacked class="label-modal" color="primary">Senha</ion-label>
+			<ion-input class="input-modal" color="light" type="password" [(ngModel)]="user.password"
+				name="user.password" placeholder="Deixe em branco para não alterar"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label stacked color="primary">Nome completo</ion-label>
+			<ion-input class="input-modal" color="light" [(ngModel)]="user.fullname" name="user.fullname"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label>Aluno do IFSUL</ion-label>
+			<ion-checkbox [(ngModel)]="user.ifsulStudent" name="user.ifsulStudent"></ion-checkbox>
+		</ion-item>
+	</form>
+	<div class="centered-text padding-buttons">
+		<button ion-button class="button-modal" color="primary" round (click)="userForm.ngSubmit.emit()">Criar
+			conta</button>
+	</div>
 </ion-content>

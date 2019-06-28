@@ -1,10 +1,34 @@
 <ion-header>
-  <ion-navbar color="primary">
-    <ion-title>Criar conta</ion-title>
-  </ion-navbar>
+	<ion-navbar color="primary">
+		<ion-title>Criar conta</ion-title>
+	</ion-navbar>
 </ion-header>
 
 
 <ion-content padding>
-
+	<img class="round-img" height="60" width="60" [src]="user.image" /><br>
+	<button ion-button class="button-modal" color="primary" round (click)="getPhoto()">Escolher imagem</button><br>
+	<form #userForm="ngForm" (ngSubmit)="handleCreateUser()">
+		<ion-item>
+			<ion-label stacked color="primary">Email</ion-label>
+			<ion-input class="input-modal" color="light" [(ngModel)]="user.email" name="user.email"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label stacked class="label-modal" color="primary">Senha</ion-label>
+			<ion-input class="input-modal" color="light" type="password" [(ngModel)]="user.password"
+				name="user.password"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label stacked color="primary">Nome completo</ion-label>
+			<ion-input class="input-modal" color="light" [(ngModel)]="user.fullname" name="user.fullname"></ion-input>
+		</ion-item>
+		<ion-item>
+			<ion-label>Aluno do IFSUL</ion-label>
+			<ion-checkbox [(ngModel)]="user.ifsulStudent" name="user.ifsulStudent"></ion-checkbox>
+		</ion-item>
+	</form>
+	<div class="centered-text padding-buttons">
+		<button ion-button class="button-modal" color="primary" round (click)="userForm.ngSubmit.emit()">Criar
+			conta</button>
+	</div>
 </ion-content>

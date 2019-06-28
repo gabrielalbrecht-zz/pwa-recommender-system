@@ -2,15 +2,15 @@
 	<ion-header>
 		<ion-toolbar color="primary" class="header-menu">
 			<ion-title></ion-title>
-			<img class="round-img" height="60" width="60" src="assets/imgs/no-profile.jpg" />
-			<p class="bold">Nome Completo</p>
-			<p>email@email.com</p>
+			<img class="round-img" height="60" width="60" [src]="user.image" />
+			<p class="bold">{{user.fullname}}</p>
+			<p>{{user.email}}</p>
 		</ion-toolbar>
 	</ion-header>
 
 	<ion-content>
 		<ion-list no-lines>
-			<button menuClose ion-item *ngFor="let p of pages" (click)="openPage(p)">
+			<button menuClose ion-item *ngFor="let p of pages" (click)="p.method(p.component, user.id)">
 				<ion-icon name="{{p.icon}}" item-left></ion-icon>{{p.title}}
 			</button>
 			<button menuClose ion-item (click)="logout()">

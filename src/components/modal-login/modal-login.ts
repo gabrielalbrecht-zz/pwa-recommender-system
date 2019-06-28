@@ -1,11 +1,10 @@
-import { MyApp } from './../../app/app.component';
-import { HomePage } from './../../pages/home/home';
 import { UserServicesProvider } from './../../providers/user-services/user-services';
 import { CreateAccountPage } from './../../pages/create-account/create-account';
 import { Component } from '@angular/core';
-import { ViewController, NavController, NavParams, App, Events } from 'ionic-angular';
+import { ViewController, NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { Login } from './../../models/login';
 import { Storage } from '@ionic/storage';
+import { Events } from 'ionic-angular';
 
 @Component({
 	selector: 'modal-login',
@@ -14,15 +13,21 @@ import { Storage } from '@ionic/storage';
 export class ModalLoginComponent {
 
 	public login: Login;
+	public loading: any;
 
-	constructor(public viewCtrl: ViewController,
+	constructor(
+		public viewCtrl: ViewController,
 		public navCtrl: NavController,
 		public navParams: NavParams,
 		private _userServices: UserServicesProvider,
-		private app: App,
-		private storage: Storage) {
-
+		private storage: Storage,
+		public events: Events,
+		public loadingCtrl: LoadingController,
+		private alertCtrl: AlertController,
+		private toastCtrl: ToastController
+	) {
 		this.login = new Login();
+		this.loading = loadingCtrl.create({ content: 'Por favor aguarde...' });
 	}
 
 	dismiss() {
@@ -31,21 +36,41 @@ export class ModalLoginComponent {
 	}
 
 	handleLogin() {
+		let loading = this.loadingCtrl.create({ content: 'Por favor aguarde...' });
 		if (!this.login.email || !this.login.password) {
-			console.log("Os campos devem ser preenchidos" + this.login.email + ".")
+			let alert = this.alertCtrl.create({ subTitle: "Os campos devem ser preenchidos!", buttons: ['OK'] });
+			loading.dismiss();
+			alert.present();
 			return;
 		}
 
 		this._userServices.login(this.login)
 			.subscribe((res: any) => {
 				if (!res.success) {
-					console.log(res.message);
+					let alert = this.alertCtrl.create({ subTitle: res.message, buttons: ['OK'] });
+					loading.dismiss();
+					alert.present();
 					return;
 				}
-				this.storage.set("loggedIn", "true");
 
-				this.app.getRootNav().setRoot(MyApp);
+				this.storage.set("loggedIn", "true");
+				this.storage.set("id", res.user.id);
+				this.storage.set("email", res.user.email);
+				this.storage.set("fullname", res.user.fullname);
+				this.storage.set("image", res.user.image);
+
+				loading.dismiss();
 				this.dismiss();
+
+				let toast = this.toastCtrl.create({
+					message: 'Login realizado!',
+					duration: 3000,
+					position: 'top'
+				});
+
+				toast.present();
+
+				this.events.publish('user:loggedIn', res.user);
 			}, (error: Error) => {
 				console.log("Error: " + error.message);
 			});

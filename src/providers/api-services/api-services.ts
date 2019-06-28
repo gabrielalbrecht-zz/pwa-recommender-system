@@ -4,7 +4,8 @@ import { Injectable } from '@angular/core';
 @Injectable()
 export class ApiServicesProvider {
 
-	private _url: string = "http://local.praticopc1.com:8080/";
+	private _url: string = "https://fast-ridge-96629.herokuapp.com/";
+	//private _url: string = "http://localhost:8080/";
 	private _httpOptions = {
 		headers: new HttpHeaders({
 			'Content-Type': 'application/json'

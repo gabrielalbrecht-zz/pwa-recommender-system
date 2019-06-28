@@ -1,3 +1,6 @@
+import { RatingServicesProvider } from './../providers/rating-services/rating-services';
+import { SpinnerDialog } from '@ionic-native/spinner-dialog';
+import { Camera } from '@ionic-native/camera';
 import { YoutubeVideoPlayer } from '@ionic-native/youtube-video-player';
 import { VideoPlayerPage } from './../pages/video-player/video-player';
 import { SettingsPage } from './../pages/settings/settings';
@@ -56,6 +59,10 @@ import { RecommenderServicesProvider } from '../providers/recommender-services/r
 		ApiServicesProvider,
 		UserServicesProvider,
 		RecommenderServicesProvider,
+		RatingServicesProvider,
+		Camera,
+		Storage,
+		SpinnerDialog,
 	]
 })
 export class AppModule { }

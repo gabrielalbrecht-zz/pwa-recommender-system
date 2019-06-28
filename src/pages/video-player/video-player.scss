@@ -1,3 +1,16 @@
 page-video-player {
+	.center {
+		margin-left: auto;
+		margin-right: auto;
+		display: block;
+	}
 
+	.center-fab {
+		margin-left: -66px;
+	}
+
+	.video-player {
+		width: 64vw;
+  		height: 36vw;
+	}
 }
