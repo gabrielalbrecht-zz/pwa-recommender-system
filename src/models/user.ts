@@ -6,7 +6,7 @@ export class User {
                 public fullname: String = "",
                 public image: String = "",
                 public ifsulStudent: Boolean = false,
-                public password: String = "",
+                public password: string = "",
         ) {
 
         }
