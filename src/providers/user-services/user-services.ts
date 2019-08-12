@@ -23,7 +23,9 @@ export class UserServicesProvider {
 		});
 		let api = this._url + 'user/login';
 
-		return this.http.post(api, data, this._api.httpOptions);
+		let httpOptions = this.mountHttpOptions();
+
+		return this.http.post(api, data, httpOptions);
 	}
 
 	createUser(user: User) {
@@ -36,15 +38,20 @@ export class UserServicesProvider {
 		});
 		let api = this._url + 'user/';
 
-		return this.http.post(api, data, this._api.httpOptions);
+		let httpOptions = this.mountHttpOptions();
+
+		return this.http.post(api, data, httpOptions);
 	}
 
-	getById(id: String) {
-		let api = this._url + 'user/' + id;
-		return this.http.get(api, this._api.httpOptions);
+	getById(sessionId) {
+		let api = this._url + 'user/';
+
+		let httpOptions = this.mountHttpOptions(sessionId);
+
+		return this.http.get(api, httpOptions);
 	}
 
-	modifyById(user: User) {
+	modifyById(user: User, sessionId) {
 		let data = JSON.stringify({
 			email: user.email,
 			password: (user.password ? Md5.hashStr(user.password) : null),
@@ -52,8 +59,35 @@ export class UserServicesProvider {
 			ifsulStudent: user.ifsulStudent,
 			image: user.image
 		});
-		let api = this._url + 'user/' + user.id;
 
-		return this.http.put(api, data, this._api.httpOptions);
+		let api = this._url + 'user/';
+
+		let httpOptions = this.mountHttpOptions(sessionId);
+
+		return this.http.put(api, data, httpOptions);
+	}
+
+	logout(sessionId) {
+		let api = this._url + 'user/logout';
+
+		let httpOptions = this.mountHttpOptions( sessionId);
+
+		return this.http.post(api, null, httpOptions);
+	}
+
+	autoLogin(sessionId) {
+		let api = this._url + 'user/autoLogin';
+
+		let httpOptions = this.mountHttpOptions(sessionId);
+
+		return this.http.post(api, null, httpOptions);
+	}
+
+	mountHttpOptions(sessionId = 0) {
+		let params = sessionId;
+		
+		let httpOptions = this._api.httpOptions(params);
+
+		return httpOptions;
 	}
 }

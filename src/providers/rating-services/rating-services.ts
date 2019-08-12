@@ -14,15 +14,25 @@ export class RatingServicesProvider {
 		this._url = this._api.url;
 	}
 
-	rate(rate: Rating) {
+	rate(rate: Rating, sessionId) {
 		let data = JSON.stringify({
-			rating: rate.rating,
 			userId: rate.userId,
+			rating: rate.rating,
 			learningMaterial: rate.learningMaterial,
 		});
 
 		let api = this._url + 'rating/';
 
-		return this.http.post(api, data, this._api.httpOptions);
+		let httpOptions = this.mountHttpOptions(sessionId);
+
+		return this.http.post(api, data, httpOptions);
+	}
+
+	mountHttpOptions(sessionId = 0) {
+		let params = sessionId;
+		
+		let httpOptions = this._api.httpOptions(params);
+
+		return httpOptions;
 	}
 }

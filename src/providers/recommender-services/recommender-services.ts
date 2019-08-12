@@ -6,15 +6,26 @@ import { ApiServicesProvider } from '../api-services/api-services';
 export class RecommenderServicesProvider {
 	private _url: String;
 
-	constructor(public http: HttpClient,
-		private _api: ApiServicesProvider) {
-
+	constructor(
+		public http: HttpClient,
+		private _api: ApiServicesProvider,
+	) {
 		this._url = this._api.url;
 	}
 
 	getLearningMaterials(query: String) {
 		let api = this._url + 'recommender/' + query;
 
-		return this.http.get(api, this._api.httpOptions);
+		let httpOptions = this.mountHttpOptions("a", 0);
+
+		return this.http.get(api, httpOptions);
+	}
+
+	mountHttpOptions(userId :String = "0", sessionId = 0) {
+		let params = sessionId;
+		
+		let httpOptions = this._api.httpOptions(params);
+
+		return httpOptions;
 	}
 }

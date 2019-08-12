@@ -17,9 +17,9 @@ export class VideoPlayerPage {
 	userId: String = "";
 	loggedIn: boolean = false;
 
-	learningMaterial: LearningMaterial;
+	sessionId: string = "";
 
-	public loading: any;
+	learningMaterial: LearningMaterial;
 
 	constructor(public navCtrl: NavController,
 		public navParams: NavParams,
@@ -39,8 +39,6 @@ export class VideoPlayerPage {
 		events.subscribe('user:loggedOut', () => {
 			this.loggedIn = false;
 		});
-
-		this.loading = loadingCtrl.create({ content: 'Por favor aguarde...' });
 	}
 
 	ionViewDidLoad() {
@@ -50,6 +48,10 @@ export class VideoPlayerPage {
 
 		this.storage.get('id').then((val) => {
 			this.userId = val;
+		});
+
+		this.storage.get('sessionId').then((val) => {
+			this.sessionId = val;
 		});
 
 		this.learningMaterial = this.navParams.get("learningMaterial");
@@ -73,7 +75,7 @@ export class VideoPlayerPage {
 
 		let rating: Rating = new Rating(rate, this.learningMaterial, this.userId);
 
-		this._ratingServices.rate(rating)
+		this._ratingServices.rate(rating, this.sessionId)
 			.subscribe((res: any) => {
 				if (!res.success) {
 					let alert = this.alertCtrl.create({

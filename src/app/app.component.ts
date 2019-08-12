@@ -7,6 +7,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { HomePage } from '../pages/home/home';
 import { User } from '../models/user';
+import { UserServicesProvider } from '../providers/user-services/user-services';
 
 @Component({
 	templateUrl: 'app.html'
@@ -19,8 +20,10 @@ export class MyApp {
 	pages: Array<{ title: string, component: any, method: any, icon: String }>;
 
 	public user: User;
+
+	public sessionId: string;
+
 	public loggedIn: boolean;
-	public loading: any;
 
 	constructor(
 		public platform: Platform,
@@ -31,7 +34,8 @@ export class MyApp {
 		public events: Events,
 		public loadingCtrl: LoadingController,
 		private alertCtrl: AlertController,
-		private toastCtrl: ToastController
+		private toastCtrl: ToastController,
+		private _userServices: UserServicesProvider,
 	) {
 		this.user = new User();
 
@@ -41,18 +45,18 @@ export class MyApp {
 
 		this.pages = [
 			{ title: 'Início', component: HomePage, method: (c) => { this.nav.setRoot(c) }, icon: 'home' },
-			{ title: 'Minha conta', component: MyAccountPage, method: (c, user) => { this.nav.push(c, { userId: user }) }, icon: 'person' },
+			{ title: 'Minha conta', component: MyAccountPage, method: (c, user) => { this.nav.push(c, { user: this.user, sessionId: this.sessionId }) }, icon: 'person' },
 		];
 
 		events.subscribe('user:loggedIn', (user) => {
 			this.user = user;
+			this.user.image = user.image ? user.image : "/assets/imgs/no-profile.jpg";
+			this.sessionId = user.session.sessionId;
 		});
 
 		events.subscribe('user:loggedOut', () => {
 			this.loggedIn = false;
 		});
-
-		this.loading = loadingCtrl.create({ content: 'Por favor aguarde...' });
 	}
 
 	initializeApp() {
@@ -69,19 +73,7 @@ export class MyApp {
 				{
 					text: "Sim",
 					handler: () => {
-						let loading = this.loading;
-						loading.present();
-						this.storage.set("loggedIn", false);
-						this.events.publish('user:loggedOut');
-						loading.dismiss();
-
-						let toast = this.toastCtrl.create({
-							message: 'Logout realizado!',
-							duration: 3000,
-							position: 'top'
-						});
-
-						toast.present();
+						this.handleLogout()
 					}
 				}, {
 					text: "Não"
@@ -90,6 +82,35 @@ export class MyApp {
 		});
 
 		alert.present();
+	}
+
+	handleLogout() {
+		let loading = this.loadingCtrl.create({ content: 'Por favor aguarde...' });
+		loading.present();
+
+		this._userServices.logout(this.sessionId).subscribe((res: any) => {
+			if (!res.success) {
+				loading.dismiss();
+				let alert = this.alertCtrl.create({ subTitle: res.message, buttons: ['OK'] });
+				alert.present();
+				return;
+			}
+
+			this.storage.clear();
+			this.events.publish('user:loggedOut');
+			loading.dismiss();
+
+			let toast = this.toastCtrl.create({
+				message: 'Logout realizado!',
+				duration: 3000,
+				position: 'top'
+			});
+
+			toast.present();
+		}, (error: Error) => {
+			console.log("Error: " + error.message);
+			loading.dismiss();
+		});
 	}
 
 	showModalLogin() {
@@ -111,11 +132,15 @@ export class MyApp {
 		});
 
 		this.storage.get('image').then((val) => {
-			this.user.image = val;
+			this.user.image = val ? val : "../assets/imgs/no-profile.jpg";
 		});
 
 		this.storage.get('id').then((val) => {
 			this.user.id = val;
+		});
+
+		this.storage.get('sessionId').then((val) => {
+			this.sessionId = val;
 		});
 	}
 }

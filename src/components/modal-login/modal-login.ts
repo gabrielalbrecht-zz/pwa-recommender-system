@@ -1,10 +1,9 @@
 import { UserServicesProvider } from './../../providers/user-services/user-services';
 import { CreateAccountPage } from './../../pages/create-account/create-account';
 import { Component } from '@angular/core';
-import { ViewController, NavController, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
+import { ViewController, NavController, Events, NavParams, LoadingController, AlertController, ToastController } from 'ionic-angular';
 import { Login } from './../../models/login';
 import { Storage } from '@ionic/storage';
-import { Events } from 'ionic-angular';
 
 @Component({
 	selector: 'modal-login',
@@ -27,7 +26,6 @@ export class ModalLoginComponent {
 		private toastCtrl: ToastController
 	) {
 		this.login = new Login();
-		this.loading = loadingCtrl.create({ content: 'Por favor aguarde...' });
 	}
 
 	dismiss() {
@@ -37,6 +35,7 @@ export class ModalLoginComponent {
 
 	handleLogin() {
 		let loading = this.loadingCtrl.create({ content: 'Por favor aguarde...' });
+		loading.present();
 		if (!this.login.email || !this.login.password) {
 			let alert = this.alertCtrl.create({ subTitle: "Os campos devem ser preenchidos!", buttons: ['OK'] });
 			loading.dismiss();
@@ -58,6 +57,7 @@ export class ModalLoginComponent {
 				this.storage.set("email", res.user.email);
 				this.storage.set("fullname", res.user.fullname);
 				this.storage.set("image", res.user.image);
+				this.storage.set("sessionId", res.user.session.sessionId);
 
 				loading.dismiss();
 				this.dismiss();
@@ -81,5 +81,4 @@ export class ModalLoginComponent {
 		let data = { 'foo': 'bar' };
 		this.viewCtrl.dismiss(data);
 	}
-
 }

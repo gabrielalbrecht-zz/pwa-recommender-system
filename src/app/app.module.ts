@@ -1,15 +1,12 @@
-import { RatingServicesProvider } from './../providers/rating-services/rating-services';
+import { RatingServicesProvider } from '../providers/rating-services/rating-services';
 import { SpinnerDialog } from '@ionic-native/spinner-dialog';
-import { Camera } from '@ionic-native/camera';
 import { YoutubeVideoPlayer } from '@ionic-native/youtube-video-player';
-import { VideoPlayerPage } from './../pages/video-player/video-player';
-import { SettingsPage } from './../pages/settings/settings';
-import { MyAccountPage } from './../pages/my-account/my-account';
-import { MeasuringKnowledgePage } from './../pages/measuring-knowledge/measuring-knowledge';
-import { CreateAccountPage } from './../pages/create-account/create-account';
+import { VideoPlayerPage } from '../pages/video-player/video-player';
+import { MyAccountPage } from '../pages/my-account/my-account';
+import { CreateAccountPage } from '../pages/create-account/create-account';
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
-import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
+import { IonicApp, IonicErrorHandler, IonicModule, IonicPageModule } from 'ionic-angular';
 import { IonicStorageModule } from '@ionic/storage';
 
 import { MyApp } from './app.component';
@@ -22,34 +19,37 @@ import { UserServicesProvider } from '../providers/user-services/user-services';
 import { ApiServicesProvider } from '../providers/api-services/api-services';
 import { HttpClientModule } from '@angular/common/http';
 import { RecommenderServicesProvider } from '../providers/recommender-services/recommender-services';
+import { Ng2ImgMaxModule } from 'ng2-img-max';
+import { ComponentsModule } from '../components/components.module';
+import { CreateAccountPageModule } from '../pages/create-account/create-account.module';
+import { MyAccountPageModule } from '../pages/my-account/my-account.module';
+import { VideoPlayerPageModule } from '../pages/video-player/video-player.module';
 
 @NgModule({
 	declarations: [
 		MyApp,
-		CreateAccountPage,
 		HomePage,
-		MeasuringKnowledgePage,
-		MyAccountPage,
-		SettingsPage,
-		ModalLoginComponent,
-		VideoPlayerPage,
 	],
 	imports: [
 		BrowserModule,
 		HttpClientModule,
 		IonicModule.forRoot(MyApp),
-		IonicStorageModule.forRoot()
+		IonicStorageModule.forRoot(),
+		Ng2ImgMaxModule,
+		ComponentsModule,
+		CreateAccountPageModule,
+		MyAccountPageModule,
+		VideoPlayerPageModule,
+		IonicPageModule.forChild(HomePage)
 	],
 	bootstrap: [IonicApp],
 	entryComponents: [
 		MyApp,
 		CreateAccountPage,
 		HomePage,
-		MeasuringKnowledgePage,
 		MyAccountPage,
-		SettingsPage,
-		ModalLoginComponent,
 		VideoPlayerPage,
+		ModalLoginComponent
 	],
 	providers: [
 		StatusBar,
@@ -60,8 +60,6 @@ import { RecommenderServicesProvider } from '../providers/recommender-services/r
 		UserServicesProvider,
 		RecommenderServicesProvider,
 		RatingServicesProvider,
-		Camera,
-		Storage,
 		SpinnerDialog,
 	]
 })

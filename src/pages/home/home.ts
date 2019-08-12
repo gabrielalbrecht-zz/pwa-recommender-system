@@ -5,6 +5,8 @@ import { NavController, ModalController, NavParams, Events, LoadingController, A
 import { ModalLoginComponent } from '../../components/modal-login/modal-login';
 import { Storage } from '@ionic/storage';
 import { RecommenderServicesProvider } from '../../providers/recommender-services/recommender-services';
+import { UserServicesProvider } from '../../providers/user-services/user-services';
+import { User } from '../../models/user';
 
 @Component({
 	selector: 'page-home',
@@ -12,10 +14,10 @@ import { RecommenderServicesProvider } from '../../providers/recommender-service
 })
 export class HomePage {
 
+	public user : User = new User();
+	public sessionId : string;
 	public loggedIn: boolean;
 	public query: String = "";
-
-	public loading: any;
 
 	public learningMaterials: LearningMaterial[] = null;
 
@@ -23,17 +25,17 @@ export class HomePage {
 		public navCtrl: NavController,
 		public modalCtrl: ModalController,
 		public navParams: NavParams,
-		private storage: Storage,
+		public storage: Storage,
 		public recommenderServices: RecommenderServicesProvider,
 		public events: Events,
 		public loadingCtrl: LoadingController,
-		private alertCtrl: AlertController,
-		private toastCtrl: ToastController
+		public alertCtrl: AlertController,
+		public toastCtrl: ToastController,
+		public _userServices: UserServicesProvider,
 	) {
-		this.loading = loadingCtrl.create({ content: 'Por favor aguarde...' });
-
 		events.subscribe('user:loggedIn', (user) => {
 			this.loggedIn = true;
+			this.user = user;
 		});
 
 		events.subscribe('user:loggedOut', () => {
@@ -47,7 +49,18 @@ export class HomePage {
 
 			if (!val) {
 				this.showModalLogin();
+				return;
 			}
+
+			this.storage.get('id').then((val) => {
+				this.user.id = val;
+
+				this.storage.get('sessionId').then((val) => {
+					this.sessionId = val;
+
+					this.handleAutoLogin();
+				})
+			})
 		});
 	}
 
@@ -63,20 +76,8 @@ export class HomePage {
 				{
 					text: "Sim",
 					handler: () => {
-						let loading = this.loading;
-						loading.present();
-						this.storage.set("loggedIn", false);
-						this.events.publish('user:loggedOut');
-						loading.dismiss();
-
-						let toast = this.toastCtrl.create({
-							message: 'Logout realizado!',
-							duration: 3000,
-							position: 'top'
-						});
-
-						toast.present();
-					}
+						this.handleLogout()
+					}	
 				}, {
 					text: "Não"
 				}
@@ -87,15 +88,97 @@ export class HomePage {
 	}
 
 	search() {
+		let loading = this.loadingCtrl.create({ content: 'Por favor aguarde...' });
+		loading.present();
 		this.recommenderServices.getLearningMaterials(this.query)
 			.subscribe((data: any) => {
 				if (data.success) {
 					this.learningMaterials = data.videos;
+					loading.dismiss();
+					return;
 				}
+
+				loading.dismiss();
+				let alert = this.alertCtrl.create({
+					subTitle: "Erro ao pesquisar materiais!",
+					buttons: [ "OK" ]
+				});
+
+				alert.present();
+			}, (error) => {
+				console.log('Error: ' + error);
+
+				loading.dismiss();
+				let alert = this.alertCtrl.create({
+					subTitle: "Erro ao pesquisar materiais!",
+					buttons: [ "OK" ]
+				});
+
+				alert.present();
 			});
 	}
 
 	watch(learningMaterial: LearningMaterial) {
 		this.navCtrl.push(VideoPlayerPage, { learningMaterial: learningMaterial });
 	}
+
+	keyupSearch(event) {
+		if (event.charCode == 13) {
+			this.search();
+		}
+	}
+
+	handleAutoLogin() {
+		this._userServices.autoLogin(this.sessionId).subscribe(
+			(res: any) => {
+				if (!res.success) {
+					this.storage.clear();
+					this.events.publish('user:loggedOut');
+					return;
+				}
+
+				this.storage.set("loggedIn", "true");
+				this.storage.set("id", res.user.id);
+				this.storage.set("email", res.user.email);
+				this.storage.set("fullname", res.user.fullname);
+				this.storage.set("image", res.user.image);
+				this.storage.set("sessionId", res.user.session.sessionId);
+
+				this.events.publish('user:loggedIn', res.user);
+			}, (error: Error) => {
+				console.log("Error: " + error.message);
+				this.storage.clear();
+					this.events.publish('user:loggedOut');
+			});
+	}
+
+	handleLogout() {
+		let loading = this.loadingCtrl.create({ content: 'Por favor aguarde...' });
+		loading.present();
+
+		this._userServices.logout(this.sessionId).subscribe((res: any) => {
+			if (!res.success) {
+				loading.dismiss();
+				let alert = this.alertCtrl.create({ subTitle: res.message, buttons: ['OK'] });
+				alert.present();
+				return;
+			}
+
+			this.storage.clear();
+			this.events.publish('user:loggedOut');
+			loading.dismiss();
+
+			let toast = this.toastCtrl.create({
+				message: 'Logout realizado!',
+				duration: 3000,
+				position: 'top'
+			});
+
+			toast.present();
+		}, (error: Error) => {
+			console.log("Error: " + error.message);
+			loading.dismiss();
+		});
+	}
+
 }

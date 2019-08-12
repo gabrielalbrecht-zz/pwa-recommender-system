@@ -19,7 +19,7 @@
 
 <ion-content padding>
 	<ion-item class="search-bar">
-		<ion-input type="text" placeholder="Pesquisar" [(ngModel)]="query"></ion-input>
+		<ion-input type="text" placeholder="Pesquisar" [(ngModel)]="query" (keypress)="keyupSearch($event)"></ion-input>
 		<button class="search-button" (click)="search()" item-right>
 			<ion-icon name="search" primary></ion-icon>
 		</button>

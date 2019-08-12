@@ -6,8 +6,12 @@
 
 
 <ion-content padding>
-	<img class="round-img" height="60" width="60" [src]="user.image" /><br>
-	<button ion-button class="button-modal" color="primary" round (click)="getPhoto()">Escolher imagem</button><br>
+	<img class="round-img" height="60" width="60" [src]="user.image" />
+	<label for="imageInput" class="imageLabel" ion-button small outline round icon-start>
+		<ion-icon name="camera"></ion-icon>
+		Upload
+	</label>
+	<input type="file" id="imageInput" class="imageInput" accept="image/*" (change)="changeListener($event)" />
 	<form #userForm="ngForm" (ngSubmit)="handleCreateUser()">
 		<ion-item>
 			<ion-label stacked color="primary">Email</ion-label>
@@ -23,7 +27,7 @@
 			<ion-input class="input-modal" color="light" [(ngModel)]="user.fullname" name="user.fullname"></ion-input>
 		</ion-item>
 		<ion-item>
-			<ion-label>Aluno do IFSUL</ion-label>
+			<ion-label>Aluno do curso de Ciência da Computação (IFSul)</ion-label>
 			<ion-checkbox [(ngModel)]="user.ifsulStudent" name="user.ifsulStudent"></ion-checkbox>
 		</ion-item>
 	</form>

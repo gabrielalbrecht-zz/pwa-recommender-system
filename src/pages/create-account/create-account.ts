@@ -2,8 +2,8 @@ import { Storage } from '@ionic/storage';
 import { UserServicesProvider } from './../../providers/user-services/user-services';
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Events, LoadingController, AlertController, ToastController } from 'ionic-angular';
-import { Camera, CameraOptions } from '@ionic-native/camera';
 import { User } from '../../models/user';
+import { Ng2ImgMaxService } from 'ng2-img-max';
 
 @IonicPage()
 @Component({
@@ -12,38 +12,51 @@ import { User } from '../../models/user';
 })
 export class CreateAccountPage {
 	public user: User;
-	public loading: any;
 
 	constructor(
 		public navCtrl: NavController,
 		public navParams: NavParams,
-		private camera: Camera,
 		private _userServices: UserServicesProvider,
 		private storage: Storage,
 		public events: Events,
 		public loadingCtrl: LoadingController,
 		private alertCtrl: AlertController,
 		private toastCtrl: ToastController,
+		private ng2ImgMaxService: Ng2ImgMaxService
 	) {
 		this.user = new User();
-		this.loading = loadingCtrl.create({ content: 'Por favor aguarde...' });
+		this.user.image = "/assets/imgs/no-profile.jpg";
 	}
 
-	getPhoto() {
-		const options: CameraOptions = {
-			quality: 70,
-			destinationType: this.camera.DestinationType.DATA_URL,
-			sourceType: this.camera.PictureSourceType.PHOTOLIBRARY,
-			saveToPhotoAlbum: false,
-			allowEdit: true,
-			targetWidth: 60,
-			targetHeight: 60
+	changeListener($event): void {
+		this.getBase64Image($event.target.files[0])
+	}
+
+	getBase64Image(file) {
+		if (!file) {
+			this.user.image = "/assets/imgs/no-profile.jpg";
+			return;
 		}
 
-		this.camera.getPicture(options).then((imageData) => {
-			this.user.image = 'data:image/jpeg;base64,' + imageData;
-		}, (err) => {
-		});
+		const maxHeight = 60;
+		const maxWidth = 60;
+
+		let self = this;
+		this.ng2ImgMaxService.resizeImage(file, maxHeight, maxWidth).subscribe(
+			result => {
+				let reader = new FileReader();
+				reader.readAsDataURL(result);
+				reader.onloadend = function () {
+					self.user.image = reader.result.toString();
+				}
+				reader.onerror = function (error) {
+					self.user.image = "/assets/imgs/no-profile.jpg";
+				};
+			},
+			error => {
+				self.user.image = "/assets/imgs/no-profile.jpg";
+			}
+		);
 	}
 
 	handleCreateUser() {
@@ -79,6 +92,7 @@ export class CreateAccountPage {
 				this.storage.set("email", res.user.email);
 				this.storage.set("fullname", res.user.fullname);
 				this.storage.set("image", res.user.image);
+				this.storage.set("sessionId", res.user.session.sessionId);
 
 				loading.dismiss();
 				this.navCtrl.pop();
